@@ -2,9 +2,10 @@
 
 create_table(){
     read -p "Enter table name: " table_name
+    table_name=${table_name,,}  # convert to lowercase
 
     # Validate table name
-    if [[ ! "$table_name" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
+    if [[ ! "$table_name" =~ ^[a-z_][a-z0-9_]*$ ]]; then
         echo -e "\nInvalid table name!\n"
         return
     fi

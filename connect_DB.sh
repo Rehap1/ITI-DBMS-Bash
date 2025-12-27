@@ -4,8 +4,10 @@
 source ./list_DB.sh
 source ./create_table.sh
 source ./list_table.sh
+source ./drop_table.sh
 source ./insert_table.sh
-
+source ./select_table.sh
+source ./delete_table.sh
 
 CURRENT_DB=""
 BASE_DIR=$(pwd)
@@ -64,8 +66,8 @@ DatabaseActions() {
             		2) list_tables;;  
             		3) drop_table ;;
             		4) insert_table ;;
-            		5) select_from_table ;;
-            		6) delete_from_table ;;
+            		5) select_table ;;
+            		6) delete_table ;;
             		7) update_table ;;
             		8) break ;;  # Exit the loop to disconnect
             		*) echo "Invalid choice!" ;;

@@ -1,5 +1,3 @@
-
-
 list_tables(){
     
     # List all files (tables) in the current connected database
@@ -12,4 +10,5 @@ list_tables(){
         echo -e "\nList of Tables:"
         echo "$tables"
     fi
+    echo
 }
