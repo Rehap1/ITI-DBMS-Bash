@@ -20,49 +20,56 @@ insert_table() {
     mapfile -t cols < <(cut -d: -f1 "$meta_file")
     mapfile -t types < <(cut -d: -f2 "$meta_file")
 
-    pk_index=0
-    row=""
+    while true; do
+        row=""
 
-    for i in "${!cols[@]}"; do
-        while true; do
-            read -p "Enter value for ${cols[i]} (${types[i]}): " value
+        for i in "${!cols[@]}"; do
+            while true; do
+                read -p "Enter value for ${cols[i]} (${types[i]}): " value
 
-            # Check for empty input
-            if [[ -z "$value" ]]; then
-                echo "Value cannot be empty!"
-                continue
-            fi
-
-            # lowercase bool
-            [[ "${types[i]}" == "bool" ]] && value=${value,,}
-
-            # validation
-            if [[ "${types[i]}" == "int" ]]; then
-                if ! [[ $value =~ ^[0-9]+$ ]]; then
-                    echo "Must be an integer"
+                # Check for empty input
+                if [[ -z "$value" ]]; then
+                    echo "Value cannot be empty!"
                     continue
                 fi
-            elif [[ "${types[i]}" == "bool" ]]; then
-                if [[ $value != "true" && $value != "false" ]]; then
-                    echo "Must be true/false"
+
+                # lowercase bool
+                [[ "${types[i]}" == "bool" ]] && value=${value,,}
+
+                # validation
+                if [[ "${types[i]}" == "int" ]]; then
+                    if ! [[ $value =~ ^[0-9]+$ ]]; then
+                        echo "Must be an integer"
+                        continue
+                    fi
+                elif [[ "${types[i]}" == "bool" ]]; then
+                    if [[ $value != "true" && $value != "false" ]]; then
+                        echo "Must be true/false"
+                        continue
+                    fi
+                fi
+
+                # check uniqueness
+                if grep -q "^$value:" "$table_name"; then
+                    echo "Primary key already exists!"
                     continue
                 fi
-            fi
-
-             # check uniqueness
-            if grep -q "^$value:" "$table_name"; then
-                echo "Primary key already exists!"
-                continue
-            fi
 
 
-            break
+                break
+            done
+
+            # append to row
+            row="${row:+$row:}$value"
         done
 
-        # append to row
-        row="${row:+$row:}$value"
-    done
+        echo "$row" >> "$table_name"
+        echo "Row inserted successfully"
 
-    echo "$row" >> "$table_name"
-    echo "Row inserted successfully"
+        read -p "Do you want to insert another row? (y/n): " choice
+        choice=${choice,,}
+        if [[ "$choice" != "y" ]]; then
+            break
+        fi
+    done
 }

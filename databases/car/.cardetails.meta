@@ -1,0 +1,4 @@
+id:int:pk
+model:string
+is_used:bool
+plateno:string
