@@ -8,6 +8,7 @@ source ./drop_table.sh
 source ./insert_table.sh
 source ./select_table.sh
 source ./delete_table.sh
+source ./update_table.sh
 
 CURRENT_DB=""
 BASE_DIR=$(pwd)
@@ -17,7 +18,7 @@ BASE_DIR=$(pwd)
 connect_Database() {
     # Check if databases directory exists and is not empty
     if [ ! -d "$databaseDir" ] || [ -z "$(ls -A "$databaseDir")" ]; then
-        echo "No databases to connect."
+        echo -e "No databases to connect. Please create a database first.\n"
         return
     fi
 
@@ -51,7 +52,7 @@ DatabaseActions() {
 
 	while true; do
 		clear
-        	echo "Database $CURRENT_DB Menu"
+        	echo -e "\nDatabase $CURRENT_DB Menu\n"
         	echo "1. Create Table"
         	echo "2. List Tables"
         	echo "3. Drop Table"
@@ -60,6 +61,7 @@ DatabaseActions() {
         	echo "6. Delete From Table"
         	echo "7. Update Table"
         	echo "8. Disconnect"
+			echo ""
         	read -r -p "Enter your choice: " choice
         	case $choice in
 					1) create_table ;;

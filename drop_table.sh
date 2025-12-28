@@ -8,6 +8,7 @@ drop_table() {
        list_tables
    fi
    read -r -p "Enter table name to drop: " table_name
+   table_name=${table_name,,}  # convert to lowercase
    # empty check
    if [[ -z "$table_name" ]]; then
        echo -e "\nTable name cannot be empty!\n"
@@ -26,7 +27,7 @@ drop_table() {
        return
    fi
    # Confirmation
-   read -r -p "Are you sure you want to drop table '$table_name'? Type 'yes' to confirm: " confirm
+   read -p "Are you sure you want to drop table '$table_name'? This action cannot be undone. (y/n): " confirm
    if [[ "$confirm" == "yes" || "$confirm" == "y" ]]; then
        rm -f "$table_file" "$meta_file"
        echo -e "\nTable '$table_name' dropped successfully.\n"

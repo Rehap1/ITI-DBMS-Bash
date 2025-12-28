@@ -22,10 +22,10 @@ create_Database() {
 		if [[ "$databaseName" == "databases" || 
 		      "$databaseName" == "select" || 
 		      "$databaseName" == "update" || 
-      		      "$databaseName" == "delete" || 
+      		  "$databaseName" == "delete" || 
 		      "$databaseName" == "insert" || 
 		      "$databaseName" == "drop" || 
-      		      "$databaseName" == "truncate" ]]; then 
+      		  "$databaseName" == "truncate" ]]; then 
 				      echo -e "\nInvalid database name. '$databaseName' is a reserved keyword\n"
 				      continue #go back to the loop
 		fi

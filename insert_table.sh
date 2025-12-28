@@ -1,3 +1,5 @@
+#!/bin/bash
+
 
 source ./list_table.sh
 

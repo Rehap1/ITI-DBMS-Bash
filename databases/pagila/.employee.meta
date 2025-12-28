@@ -1,0 +1,4 @@
+id:int:pk
+name:string
+city:string
+is_active:bool

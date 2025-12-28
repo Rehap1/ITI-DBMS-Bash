@@ -13,38 +13,128 @@ select_table(){
         break
     done
 
-    meta_file=".$table_name.meta"
+    while true; do
+        
     
-    # Read metadata
-    mapfile -t cols  < <(cut -d: -f1 "$meta_file")
-    mapfile -t types < <(cut -d: -f2 "$meta_file")
+        meta_file=".$table_name.meta"
+        
+        # Read metadata
+        mapfile -t cols  < <(cut -d: -f1 "$meta_file")
+        mapfile -t types < <(cut -d: -f2 "$meta_file")
 
-    echo
-    echo "1) Select ALL"
-    echo "2) Select Specific Columns"
-    echo "3) Select with WHERE condition"
-    echo "4) Back"
+       
+        echo
+        echo "1. Select ALL"
+        echo "2. Select ALL with WHERE condition"
+        echo "3. Select Specific Columns"
+        echo "4. Select Specific Columns with WHERE condition"
+        echo "5. Back"
 
-    read -p "Choice: " choice
+        read -p "Choice: " choice
 
-    case $choice in
-        # ================= SELECT * =================
-        1) printf "%s\t" "${cols[@]}" 
-           echo
-           echo "-----------------------------------"
-           while IFS=: read -r -a row; do
-                printf "%s\t" "${row[@]}"
+        case $choice in
+            # ================= SELECT * =================
+            1) 
+            echo
+            printf "%-15s\t" "${cols[@]}" 
+            echo
+            echo "-------------------------------------------"
+            while IFS=: read -r -a row; do
+                    printf "%-15s\t" "${row[@]}"
+                    echo
+            done < "$table_name"
+            ;;
+
+            # ================= SELECT ALL WHERE =================
+            2) 
+            echo
+            read -p "Enter condition (column_name = value): " condition
+            condition=${condition,,}
+            condition=${condition// /}  # remove spaces
+
+            if [[ ! "$condition" =~ ^([a-z_][a-z0-9_]*)=([^=]+)$ ]]; then
+                echo "Invalid condition format. Use column_name = value."
+                return
+                else
+                where_col="${BASH_REMATCH[1]}"
+                where_val="${BASH_REMATCH[2]}"
+            fi
+            
+
+                where_index=-1
+                for i in "${!cols[@]}"; do
+                    if [[ "${cols[i]}" == "$where_col" ]]; then
+                        where_index=$i
+                        break
+                    fi
+                done
+
+                if [[ $where_index -eq -1 ]]; then
+                    echo "Column $where_col does not exist."
+                    return
+                fi
                 echo
-           done < "$table_name"
-        ;;
+                printf "%-15s\t" "${cols[@]}"
+                echo
+                echo "-------------------------------------------"
 
-        # ================= SELECT COLUMNS =================
-        2) read -p "Enter column names (comma separated): " input
+                while IFS=: read -r -a row; do
+                    if [[ "${row[where_index],,}" == "$where_val" ]]; then
+                        printf "%-15s\t" "${row[@]}"
+                        echo
+                    fi
+                done < "$table_name"
+            ;;
+
+            # ================= SELECT COLUMNS =================
+            3) 
+                echo
+                read -p "Enter column names (comma separated): " input
+                IFS=',' read -r -a selected_cols <<< "$input"
+
+                indexes=()
+                for sel_col in "${selected_cols[@]}"; do
+                    found=0
+                    sel_col=${sel_col,,}  # convert to lowercase
+                    sel_col=${sel_col// /}  # remove spaces
+                    for i in "${!cols[@]}"; do
+                        if [[ "${cols[i]}" == "$sel_col" ]]; then
+                            indexes+=("$i")
+                            found=1
+                            break
+                        fi
+                    done
+                    if [[ $found -eq 0 ]]; then
+                        echo "Column $sel_col does not exist."
+                        return
+                    fi
+                done
+
+                echo
+                printf "%-15s\t" "${selected_cols[@]}"
+                echo
+                echo "-------------------------------------------"
+
+                while IFS=: read -r -a row; do
+                    for idx in "${indexes[@]}"; do
+                        printf "%-15s\t" "${row[idx]}"
+                    done
+                    echo
+                done < "$table_name"
+            ;;
+
+            # ================= SELECT COLUMNS WHERE =================
+            4) 
+            echo
+            read -p "Enter column names (comma separated): " input
             IFS=',' read -r -a selected_cols <<< "$input"
 
+            # Convert to lowercase and find indexes
             indexes=()
             for sel_col in "${selected_cols[@]}"; do
                 found=0
+                sel_col=${sel_col,,}
+                sel_col=${sel_col// /}
                 for i in "${!cols[@]}"; do
                     if [[ "${cols[i]}" == "$sel_col" ]]; then
                         indexes+=("$i")
@@ -58,32 +148,19 @@ select_table(){
                 fi
             done
 
-            printf "%s\t" "${selected_cols[@]}"
-            echo
-            echo "--------------------------------"
+            read -p "Enter condition (column_name = value): " condition
+            condition=${condition,,}
+            condition=${condition// /}
 
-            while IFS=: read -r -a row; do
-                for idx in "${indexes[@]}"; do
-                    printf "%s\t" "${row[idx]}"
-                done
-                echo
-            done < "$table_name"
-        ;;
-
-        # ================= SELECT WHERE =================
-        3) read -p "Enter condition (column_name = value): " condition
-           
-           condition=${condition// /}  # remove spaces
-
-           if [[ ! "$condition" =~ ^([a-zA-Z_][a-zA-Z0-9_]*)=([^=]+)$ ]]; then
-               echo "Invalid condition format. Use column_name = value."
-               return
+            if [[ ! "$condition" =~ ^([a-z_][a-z0-9_]*)=([^=]+)$ ]]; then
+                echo "Invalid condition format. Use column_name = value."
+                return
             else
-               where_col="${BASH_REMATCH[1]}"
-               where_val="${BASH_REMATCH[2]}"
-           fi
-           
+                where_col="${BASH_REMATCH[1]}"
+                where_val="${BASH_REMATCH[2]}"
+            fi
 
+            # Find where column index
             where_index=-1
             for i in "${!cols[@]}"; do
                 if [[ "${cols[i]}" == "$where_col" ]]; then
@@ -91,28 +168,32 @@ select_table(){
                     break
                 fi
             done
+            [[ $where_index -eq -1 ]] && { echo "Column $where_col does not exist"; return; }
 
-            if [[ $where_index -eq -1 ]]; then
-                echo "Column $where_col does not exist."
-                return
-            fi
-
-            printf "%s\t" "${cols[@]}"
+            # Print header
             echo
-            echo "-----------------------------------"
+            printf "%-15s\t" "${selected_cols[@]}"
+            echo
+            echo "-------------------------------------------"
 
-            while IFS=: read -r -a row; do
-                if [[ "${row[where_index]}" == "$where_val" ]]; then
-                    printf "%s\t" "${row[@]}"
+                while IFS=: read -r -a row; do
+                if [[ "${row[where_index],,}" == "$where_val" ]]; then
+                    for idx in "${indexes[@]}"; do
+                        printf "%-15s\t" "${row[idx]}"
+                    done
                     echo
                 fi
             done < "$table_name"
-        ;;
 
-        4) return ;;
-        *)  echo "Invalid choice!" ;;
 
-    esac
+            ;;
+
+            5) return ;;
+            *)  echo "Invalid choice!" ;;
+
+        esac
+    done
+
 }
 
 

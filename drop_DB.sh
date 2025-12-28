@@ -11,8 +11,16 @@ drop_Database() {
 
 
     if [[ -d "$DB" ]]; then
-        rm -r "$DB"
-        echo -e "\nDatabase $dbname dropped successfully.\n"
+        read -p "Are you sure you want to drop database '$dbname'? This action cannot be undone. (y/n): " confirm
+        confirm=${confirm,,}  # convert to lowercase
+        if [[ "$confirm" != "y" ]]; then
+            echo -e "\nDrop database canceled.\n"
+            return
+        else
+            rm -r "$DB"
+            echo -e "\nDatabase $dbname dropped successfully.\n"
+        fi
+  
     else
         echo -e "\nDatabase $dbname does not exist.\n"
     fi
