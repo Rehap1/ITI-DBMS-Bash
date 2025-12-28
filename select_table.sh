@@ -1,5 +1,16 @@
 source ./list_DB.sh
 
+# Function to print a dynamic separator line based on number of columns
+print_separator() {
+    local cols_array=("$@")   # Accept array of column names
+    local line=""
+    for col in "${cols_array[@]}"; do
+        line+="-----------------"
+    done
+    echo "$line"
+}
+
+
 select_table(){
     list_tables
     
@@ -38,7 +49,7 @@ select_table(){
             echo
             printf "%-15s\t" "${cols[@]}" 
             echo
-            echo "-------------------------------------------"
+            print_separator "${cols[@]}" 
             while IFS=: read -r -a row; do
                     printf "%-15s\t" "${row[@]}"
                     echo
@@ -76,7 +87,7 @@ select_table(){
                 echo
                 printf "%-15s\t" "${cols[@]}"
                 echo
-                echo "-------------------------------------------"
+                print_separator "${cols[@]}" 
 
                 while IFS=: read -r -a row; do
                     if [[ "${row[where_index],,}" == "$where_val" ]]; then
@@ -113,7 +124,7 @@ select_table(){
                 echo
                 printf "%-15s\t" "${selected_cols[@]}"
                 echo
-                echo "-------------------------------------------"
+                print_separator "${selected_cols[@]}"
 
                 while IFS=: read -r -a row; do
                     for idx in "${indexes[@]}"; do
@@ -174,9 +185,9 @@ select_table(){
             echo
             printf "%-15s\t" "${selected_cols[@]}"
             echo
-            echo "-------------------------------------------"
+            print_separator "${selected_cols[@]}"
 
-                while IFS=: read -r -a row; do
+            while IFS=: read -r -a row; do
                 if [[ "${row[where_index],,}" == "$where_val" ]]; then
                     for idx in "${indexes[@]}"; do
                         printf "%-15s\t" "${row[idx]}"

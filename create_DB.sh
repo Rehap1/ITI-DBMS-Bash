@@ -26,6 +26,7 @@ create_Database() {
 		      "$databaseName" == "insert" || 
 		      "$databaseName" == "drop" || 
       		  "$databaseName" == "truncate" ]]; then 
+			  		  
 				      echo -e "\nInvalid database name. '$databaseName' is a reserved keyword\n"
 				      continue #go back to the loop
 		fi

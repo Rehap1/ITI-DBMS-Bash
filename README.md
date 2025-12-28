@@ -25,6 +25,21 @@ ShellScriptDB/
 ```
 ---
 
+## Features
 
+The Application will be GUI Menu based app, that will provide to user this Menu items:
+- Create Database
+- List Database
+- Connect To Database
+- Drop a Database\
+
+Upon user Connect to Specific Database, there will be new GUI Screen with
+- Create Table
+- List Tables
+- Drop Table
+- Insert into table
+- select from table
+- delete from table
+- Update table\
 
  
