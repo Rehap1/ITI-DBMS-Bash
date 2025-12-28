@@ -3,12 +3,12 @@
 source ./list_table.sh
 
 drop_table() {
-   # Optional: show tables first (same style as insert_table)
-   if declare -f list_tables >/dev/null 2>&1; then
-       list_tables
-   fi
+    # List tables before dropping
+    
+    list_tables
+
    read -r -p "Enter table name to drop: " table_name
-   table_name=${table_name,,}  # convert to lowercase
+   table_name=${table_name,,}  
    # empty check
    if [[ -z "$table_name" ]]; then
        echo -e "\nTable name cannot be empty!\n"
