@@ -1,3 +1,5 @@
+#!/bin/bash
+
 list_tables(){
     
     # List all files (tables) in the current connected database

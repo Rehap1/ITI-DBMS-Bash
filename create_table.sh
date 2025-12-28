@@ -1,3 +1,5 @@
+#!/bin/bash
+
 create_table() {
     read -p "Enter table name: " table_name
     table_name=${table_name,,}

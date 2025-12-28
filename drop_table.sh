@@ -35,8 +35,3 @@ drop_table() {
        echo -e "\nDrop table canceled.\n"
    fi
 }
-# If you run this file directly: ./dropTable.sh
-# it will execute drop_table once.
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
-   drop_table
-fi
